@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  ide_core:
+    image: codingminutes/olympus
+    env_file:
+      - .env
+    ports:
+      - "8982:8982"
+    build: .
