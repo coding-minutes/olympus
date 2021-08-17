@@ -12,4 +12,4 @@ RUN poetry install --no-root --no-interaction --no-ansi
 
 COPY . .
 
-ENTRYPOINT [ "gunicorn", "ide_core.wsgi", "-b", "0.0.0.0:8982" ]
+ENTRYPOINT [ "gunicorn", "olympus.wsgi", "-b", "0.0.0.0:8982" ]

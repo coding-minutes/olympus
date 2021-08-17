@@ -1,10 +1,18 @@
 version: "3"
 
 services:
-  ide_core:
+  olympus:
     image: codingminutes/olympus
     env_file:
       - .env
     ports:
       - "8982:8982"
     build: .
+    depends_on: 
+      - postgres
+  postgres:
+    image: postgres:12.7
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    env_file:
+      - .env
