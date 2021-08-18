@@ -1,8 +1,8 @@
 from django.urls import path, include
-from api.views import PingPongView, GetUserView, SignInUser
+from api.views import GetUserView, SignInUser, VerifyView
 
 urlpatterns = [
-    path("ping/", PingPongView.as_view()),
     path("users/<pk>", GetUserView.as_view()),
-    path('users/signin/', SignInUser.as_view()),
+    path("users/signin/", SignInUser.as_view()),
+    path("sessions/verify/", VerifyView.as_view()),
 ]

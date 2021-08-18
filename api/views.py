@@ -1,46 +1,44 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import RetrieveAPIView
-
+from rest_framework.generics import GenericAPIView
 from api.models import Profile, User
-from api.serializers import ProfileSerializer
-from domain.services.google import get_google_authenticator
-from utils.jwt import encode
+from utils.jwt import encode, decode
+from domain.services.oauth_strategies.factory import OAuthFactory
+from jwt.exceptions import DecodeError
+from domain.errors import InvalidCredentials
 
 
-class PingPongView(APIView):
-    def get(self, request):
-        return Response({"msg": "pong"}, status=200)
-
-
-class GetUserView(RetrieveAPIView):
-    serializer_class = ProfileSerializer
+class GetUserView(GenericAPIView):
     queryset = Profile.objects.all()
 
+    def get(self, request, *args, **kwargs):
+        profile = self.get_object()
+        return Response({"data": profile.to_domain_model().to_dict()})
 
 
 class SignInUser(APIView):
-    serializer = ProfileSerializer
-    
-    def get_queryset(self):
-        return Profile.objects.all()
+    queryset = Profile.objects.all()
 
     def post(self, request):
-        strategy = request.data.get('strategy', 'google')
-        if strategy == 'google':
-            token = request.data.get("token")
-            user = get_google_authenticator().authenticate(google_jwt_token=token)
-        userobj, created = User.objects.get_or_create(email=user.email, defaults= {"email":user.email})
-        if created:
-            status=201
-            user = user.to_dict()
-            user['user_id'] = userobj.uuid
-            del user['email']
-            profile = Profile.objects.create(**user)
-        else:
-            status=200
-            profile = Profile.objects.get(user=userobj.uuid)
-        serialize = self.serializer(profile)
-        jwt = encode(serialize.data)
-        return Response({"jwt": jwt}, status=status)
+        strategy = request.data.get("strategy", "google")
+        try:
+            profile = OAuthFactory.get(name=strategy).get_user_for_credentials(
+                **request.data.get("data")
+            )
+        except InvalidCredentials:
+            return Response({"error": "Invalid Credentials"},status=401)
+        jwt = encode(profile.to_dict())
+        return Response({"jwt": jwt})
 
+
+class VerifyView(APIView):
+    def post(self, request, *args, **kwargs):
+        jwt = request.data.get("jwt")
+
+        try:
+            data = decode(jwt)
+            uuid = data["id"]
+            User.objects.get(pk=uuid)
+            return Response({"verified": True}, status=200)
+        except (DecodeError, User.DoesNotExist):
+            return Response({"verified": False}, status=401)

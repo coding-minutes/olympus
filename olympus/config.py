@@ -6,7 +6,7 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "abc")
     ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 
-    JWT_SECRET = os.environ.get("JWT_SECRET", 'abc')
+    JWT_SECRET = os.environ.get("JWT_SECRET", "abc")
 
     DB_NAME = os.environ.get("POSTGRES_DB")
     DB_HOST = os.environ.get("POSTGRES_HOST")
