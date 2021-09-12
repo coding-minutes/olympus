@@ -37,7 +37,7 @@ class VerifyView(APIView):
 
         try:
             data = decode(jwt)
-            uuid = data["id"]
+            uuid = data.get("id", None)
             User.objects.get(pk=uuid)
             return Response({"verified": True}, status=200)
         except (DecodeError, User.DoesNotExist):
