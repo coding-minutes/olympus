@@ -26,7 +26,7 @@ class SignInUser(APIView):
                 **request.data.get("data")
             )
         except InvalidCredentials:
-            return Response({"error": "Invalid Credentials"},status=401)
+            return Response({"error": "Invalid Credentials"}, status=401)
         jwt = encode(profile.to_dict())
         return Response({"jwt": jwt})
 

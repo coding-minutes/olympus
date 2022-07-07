@@ -12,3 +12,6 @@ class Config:
     DB_HOST = os.environ.get("POSTGRES_HOST")
     DB_USER = os.environ.get("POSTGRES_USER")
     DB_PASS = os.environ.get("POSTGRES_PASSWORD")
+
+    GITHUB_CLIENT_ID = os.environ.get("GITHUB_CLIENT_ID")
+    GITHUB_CLIENT_SECRET = os.environ.get("GITHUB_CLIENT_SECRET")
